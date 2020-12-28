@@ -7,7 +7,7 @@ To-Do's:
 import helper
 import json
 
-
+'''
 # extract the contents of the given urls
 filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books_small.txt"
 file_book_urls = open(filepath, 'r')
@@ -73,8 +73,6 @@ f.close()
 f = open("df.json", "w")
 json.dump(document_frequency_table, f, indent=2)
 f.close()
-
-'''
 
 
 

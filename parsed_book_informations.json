@@ -379,33 +379,6 @@
         "https://www.goodreads.com/book/show/18405.Gone_with_the_Wind",
         "https://www.goodreads.com/book/show/890.Of_Mice_and_Men"
       ]
-    },
-    {
-      "title": "The Informers",
-      "author": [
-        "Bret Easton Ellis"
-      ],
-      "description": "\\n    <script type=\"text/javascript\">\\n    //<![CDATA[\\n      $j(document).ready(function() {\\n        var vis = renderRatingGraph(\\n            [3246, 5440, 6607, 2764, 1058],\\n            \"reviewControls__ratingDetailsMiniGraph\");\\n        $j(\"#reviewControls__ratingDetailsMiniGraph\").prependTo(\"#rating_details_tip\");\\n      });\\n    //]]>\\n    </script>\\n    ",
-      "urls_of_recommended_books": [
-        "https://www.goodreads.com/book/show/25870405-the-blade-artist",
-        "https://www.goodreads.com/book/show/23965.Porno",
-        "https://www.goodreads.com/book/show/23966.Filth",
-        "https://www.goodreads.com/book/show/46945.Requiem_for_a_Dream",
-        "https://www.goodreads.com/book/show/12926063-skagboys",
-        "https://www.goodreads.com/book/show/36236123-survivor",
-        "https://www.goodreads.com/book/show/497199.Factotum",
-        "https://www.goodreads.com/book/show/14817.A_Scanner_Darkly",
-        "https://www.goodreads.com/book/show/567678.The_Wasp_Factory",
-        "https://www.goodreads.com/book/show/36236125-invisible-monsters",
-        "https://www.goodreads.com/book/show/40409718-post-office",
-        "https://www.goodreads.com/book/show/135836.Trainspotting",
-        "https://www.goodreads.com/book/show/29908754-the-zombie-room",
-        "https://www.goodreads.com/book/show/9293020-the-elephant-tree",
-        "https://www.goodreads.com/book/show/36236124-fight-club",
-        "https://www.goodreads.com/book/show/41817486-a-clockwork-orange",
-        "https://www.goodreads.com/book/show/332613.One_Flew_Over_the_Cuckoo_s_Nest",
-        "https://www.goodreads.com/book/show/10737650-the-marbled-swarm"
-      ]
     }
   ]
 }
