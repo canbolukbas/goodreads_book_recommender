@@ -2,6 +2,7 @@
 To-Do's:
 - \\xe2\\x80\\x99 problem is solved. But other may emerge.
 - Genres will be added later.
+- Informer kitabından span 1 olduğu için patlıyor.
 '''
 
 import urllib.request
