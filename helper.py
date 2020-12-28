@@ -6,9 +6,10 @@ To-Do's:
 
 import urllib.request
 import re
+import string
 
 def parse(url: str):
-    '''
+
     f = urllib.request.urlopen(url)
     myfile = str(f.read())
     f.close()
@@ -17,6 +18,7 @@ def parse(url: str):
     f = open("test.txt", "r")
     myfile = f.read()
     f.close()
+    '''
 
     # calculations on myfile
     # TITLE = <h1 id="bookTitle" class="gr-h1 gr-h1--serif" itemprop="name">\n ....... \n</h1>
@@ -40,6 +42,7 @@ def parse(url: str):
     span = re.findall('<span id=".*?".*?</span>' , description_readable_stacked)[1] # first one is the short one
     #print(span)
     #print()
+    # cleaning description from tags
     description = " ".join(re.split('<br ?/>',re.split('</span>', re.split('<span id=".*?".*?>',span)[-1])[0]))
     # replace \xe2\x80\x99 with '
     description = description.replace('\\xe2\\x80\\x99', '\'')
@@ -54,6 +57,33 @@ def parse(url: str):
 
     #print("Urls of total {} books are below:".format(len(urls_of_recommended_books)))
     #print(urls_of_recommended_books)
-
-
     return title, authors, description, urls_of_recommended_books
+
+def normalize(text):
+
+    # case-folding
+    text = text.lower()
+
+    # convert punctuations into whitespace, instead of deleting them
+    # e.g. in "string1/string2" case, it is better to convert it into whitespace
+    text_with_no_punc = ""
+    punc_set = set(string.punctuation)
+    for ch in text:
+        if ch not in punc_set:
+            text_with_no_punc += ch
+        else:
+            text_with_no_punc += " "
+
+    
+    # white space removal
+    tokens = text_with_no_punc.split()
+
+    # removing tokens with 0 length (idk how it's possible)
+    temp = []
+    for token in tokens:
+        if len(token) == 0:
+            continue
+
+        temp.append(token)
+
+    return temp

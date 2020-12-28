@@ -7,6 +7,7 @@ To-Do's:
 import helper
 import json
 
+
 # extract the contents of the given urls
 filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books_small.txt"
 file_book_urls = open(filepath, 'r')
@@ -20,10 +21,15 @@ for book_url in book_urls:
     title, author, description, urls_of_recommended_books = helper.parse(book_url)
     docs['books'].append({'title': title, 'author': author, 'description': description, 'urls_of_recommended_books': urls_of_recommended_books})
 
-# save the contents in a file
 # Save the contents in JSON format.
 f = open("parsed_book_informations.json", "w")
 json.dump(docs, f, indent=2)
+f.close()
+'''
+
+# read parsed book informations by JSON module
+f = open("parsed_book_informations.json", "r")
+parsed_book_informations = json.load(f)
 f.close()
 
 # identify terms and calculate weights
@@ -31,6 +37,47 @@ f.close()
 # process descriptions.
 # identify vocabulary.
 # Identify term and inverse document frequencies.
+term_frequency_table = dict()
+document_frequency_table = dict()
+for book_id, book_info in enumerate(parsed_book_informations['books']):
+    doc = book_info['description']
+    tokens = helper.normalize(doc)
+
+    # Construct document freq.(df) table.
+    # df represents the number of documents a term appears on.
+    for token in set(tokens):
+        if token in document_frequency_table:
+            document_frequency_table[token] += 1
+        else:
+            document_frequency_table[token] = 1
+            
+    # Construct term freq.(tf) table.
+    # tf represents number of times a term appears on each document.
+    for token in tokens:
+
+        if token in term_frequency_table:
+            if book_id in term_frequency_table[token]:
+                term_frequency_table[token][book_id] += 1
+            else:
+                term_frequency_table[token][book_id] = 1
+        else:
+            term_frequency_table[token] = {book_id: 1}
+
+    
+# Save tf in JSON format.
+f = open("tf.json", "w")
+json.dump(term_frequency_table, f, indent=2)
+f.close()
+
+# Save df in JSON format.
+f = open("df.json", "w")
+json.dump(document_frequency_table, f, indent=2)
+f.close()
+
+'''
+
+
+
 # Select informative words by setting min/max thresholds on freq and number of terms(or sth else)
 # Encode each book's description by using the occurences and scores of these informative words
 
