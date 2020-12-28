@@ -1,12 +1,13 @@
 '''
 To-Do's:
-- Decide how to include book genres
+- Decide how to include book genres. Genres is not considered right now.
 - Parse the other html informations and store them(?)
 - Use actual dataset, not the smaller one.
 '''
 import helper
-# extract the contents of the given urls
+import json
 
+# extract the contents of the given urls
 filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books_small.txt"
 file_book_urls = open(filepath, 'r')
 book_urls = []
@@ -16,12 +17,14 @@ file_book_urls.close()
 
 docs = {"books": []}
 for book_url in book_urls:
-    title, author, description, urls_of_recommended_books, genres = helper.parse(book_url)
-    docs['books'].append({'title': title, 'author': author, 'description': description, 'urls_of_recommended_books': urls_of_recommended_books, 'genres': genres})
-    break
-
+    title, author, description, urls_of_recommended_books = helper.parse(book_url)
+    docs['books'].append({'title': title, 'author': author, 'description': description, 'urls_of_recommended_books': urls_of_recommended_books})
 
 # save the contents in a file
+# Save the contents in JSON format.
+f = open("parsed_book_informations.json", "w")
+json.dump(docs, f, indent=2)
+f.close()
 
 # identify terms and calculate weights
 # tf-idf weighting is a must.

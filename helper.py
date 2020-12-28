@@ -1,6 +1,7 @@
 '''
 To-Do's:
 - \\xe2\\x80\\x99 problem is solved. But other may emerge.
+- Genres will be added later.
 '''
 
 import urllib.request
@@ -11,7 +12,7 @@ def parse(url: str):
     f = urllib.request.urlopen(url)
     myfile = str(f.read())
     f.close()
-    print(type(myfile))
+    #print(type(myfile))
     '''
     f = open("test.txt", "r")
     myfile = f.read()
@@ -20,8 +21,8 @@ def parse(url: str):
     # calculations on myfile
     # TITLE = <h1 id="bookTitle" class="gr-h1 gr-h1--serif" itemprop="name">\n ....... \n</h1>
     title = re.search("<h1.*</h1>", myfile).group().split("\\n")[1].lstrip().rstrip()
-    print("title: " + title)
-    print()
+    #print("title: " + title)
+    #print()
 
     # AUTHOR = <a class="authorName" itemprop="url" href=.*><span itemprop="name">.*</span></a>
     authors = re.findall('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">.*?</span></a>', myfile)
@@ -29,8 +30,8 @@ def parse(url: str):
         author = authors[i]
         author = re.split('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">', author)[-1]
         authors[i] = re.split('</span></a>', author)[0]
-    print("authors : " + ", ".join(authors))
-    print()
+    #print("authors : " + ", ".join(authors))
+    #print()
 
     # DESCRIPTION = <div id="description" class="readable stacked" style="right:0"> </div> arasında. fakat ilk span değil, ikinci span. ikinci spande <div> ile </div> arasında. </p><p>'leri filan ignore et.
     description_readable_stacked = re.findall('<div id="description" class="readable stacked" style="right:0">.*?<a data-text-id=".*?" href="#" onclick', myfile)[0]
@@ -42,15 +43,17 @@ def parse(url: str):
     description = " ".join(re.split('<br ?/>',re.split('</span>', re.split('<span id=".*?".*?>',span)[-1])[0]))
     # replace \xe2\x80\x99 with '
     description = description.replace('\\xe2\\x80\\x99', '\'')
-    print("Description:")
-    print(description)
-    print()
+    #print("Description:")
+    #print(description)
+    #print()
+
+    temp = re.findall('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href=".*?"><img alt="', myfile)
+    urls_of_recommended_books = []
+    for tempp in temp:
+        urls_of_recommended_books.append(re.split('"><img alt="',re.split('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href="', tempp)[-1])[0])
+
+    #print("Urls of total {} books are below:".format(len(urls_of_recommended_books)))
+    #print(urls_of_recommended_books)
 
 
-    
-
-    
-
-
-
-    return "title", "author", "description", ["urls_of_recommended_books"], ["genres"]
+    return title, authors, description, urls_of_recommended_books
