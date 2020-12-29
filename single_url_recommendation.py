@@ -120,10 +120,23 @@ for book_id in top18books:
 #print()
 #print(urls_of_recommended_books)
 #print()
-temp = set(top18books_urls).intersection(set(urls_of_recommended_books))
-#print(temp)
+precision_acc = 0
+counter = 0
+for i, url in enumerate(urls_of_recommended_books):
+    if url in set(top18books_urls):
+        counter += 1
+        precision_acc += counter / (i+1)
 
 
+final_precision = len(set(top18books_urls).intersection(set(urls_of_recommended_books))) / len(top18books_urls)
+if counter != 0:
+    average_precision = precision_acc / counter
+else:
+    average_precision = 0
+
+
+print("final_precision: " + str(final_precision))
+print("average_precision: " + str(average_precision))
 
 
 # Output precision and average precision scores.
