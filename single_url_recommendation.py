@@ -2,6 +2,7 @@
 To-Do's:
 - cosine similarity'de book genres da eklenecek
 - I've assumed given URL already exists in given builded tf-idf model Ama bu yanlış gibi ya.
+- peter thiel kitabında 17 recommendation döndürdü, ama nietzsche'de 18. sıkıntı olmadı. bu neden oluyor
 '''
 
 import helper
@@ -11,7 +12,7 @@ import json
 
 # extract the content of the book whose url is given
 # title, author, description, urls of recommended books and genres
-book_url = "https://www.goodreads.com/book/show/18050143-zero-to-one"
+book_url = "https://www.goodreads.com/book/show/162022.Nietzsche"
 title, authors, description, urls_of_recommended_books = helper.parse(book_url)
 
 # output the content into terminal (I guess)
@@ -82,7 +83,10 @@ for i in range(len(parsed_book_informations['books'])):
 
 scores_normalized = []
 for i in range(len(scores)):
-    scores_normalized.append(scores[i]/(lengths[i]*lengths[current_book_id]))
+    if lengths[i]==0:
+        scores_normalized.append(0)
+    else:
+        scores_normalized.append(scores[i]/(lengths[i]*lengths[current_book_id]))
 #print(scores_normalized)
 
 top18books = []
@@ -97,7 +101,7 @@ for i, item in enumerate(temp):
 # Consider Goodreads recommendations as ground truth
 
 # To evaluate, I need their urls.
-filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books_50.txt"
+filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books.txt"
 file_book_urls = open(filepath, 'r')
 book_urls = []
 for line in file_book_urls:
@@ -106,13 +110,20 @@ file_book_urls.close()
 
 top18books_urls = []
 for book_id in top18books:
-    top18books_urls.append(book_urls[book_id].replace("\'", ""))
-print(top18books_urls)
-print()
-print(urls_of_recommended_books)
-print()
+    try:
+        top18books_urls.append(book_urls[book_id].replace("\'", ""))
+    except:
+        print("list index out of range error is get with following infos:")
+        print("book_id : " + str(book_id))
+        print("len of book_urls: " + str(len(book_urls)))
+#print(top18books_urls)
+#print()
+#print(urls_of_recommended_books)
+#print()
 temp = set(top18books_urls).intersection(set(urls_of_recommended_books))
-print(temp)
+#print(temp)
+
+
 
 
 # Output precision and average precision scores.

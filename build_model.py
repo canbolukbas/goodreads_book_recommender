@@ -11,7 +11,7 @@ import math
 
 '''
 # extract the contents of the given urls
-filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books_50.txt"
+filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books.txt"
 file_book_urls = open(filepath, 'r')
 book_urls = []
 for line in file_book_urls:
@@ -20,7 +20,10 @@ file_book_urls.close()
 
 docs = {"books": []}
 for book_url in book_urls:
-    title, author, description, urls_of_recommended_books = helper.parse(book_url)
+    try:
+        title, author, description, urls_of_recommended_books = helper.parse(book_url)
+    except:
+        docs['books'].append({'title': "", 'author': [], 'description': "", 'urls_of_recommended_books': []})
     docs['books'].append({'title': title, 'author': author, 'description': description, 'urls_of_recommended_books': urls_of_recommended_books})
 
 # Save the contents in JSON format.
