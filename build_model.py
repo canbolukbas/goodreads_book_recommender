@@ -3,6 +3,7 @@ To-Do's:
 - Decide how to include book genres. Genres is not considered right now.
 - Parse the other html informations and store them(?)
 - Use actual dataset, not the smaller one.
+- Currently, I'm just applying tf-idf. I didn't select informative words.
 '''
 import helper
 import json
