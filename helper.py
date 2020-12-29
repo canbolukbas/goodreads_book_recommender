@@ -23,39 +23,50 @@ def parse(url: str):
 
     # calculations on myfile
     # TITLE = <h1 id="bookTitle" class="gr-h1 gr-h1--serif" itemprop="name">\n ....... \n</h1>
-    title = re.search("<h1.*</h1>", myfile).group().split("\\n")[1].lstrip().rstrip()
+    try:
+        title = re.search("<h1.*</h1>", myfile).group().split("\\n")[1].lstrip().rstrip()
+    except:
+        title = ""
+    
     #print("title: " + title)
     #print()
 
-    # AUTHOR = <a class="authorName" itemprop="url" href=.*><span itemprop="name">.*</span></a>
-    authors = re.findall('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">.*?</span></a>', myfile)
-    for i in range(len(authors)):
-        author = authors[i]
-        author = re.split('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">', author)[-1]
-        authors[i] = re.split('</span></a>', author)[0]
+    try:
+        # AUTHOR = <a class="authorName" itemprop="url" href=.*><span itemprop="name">.*</span></a>
+        authors = re.findall('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">.*?</span></a>', myfile)
+        for i in range(len(authors)):
+            author = authors[i]
+            author = re.split('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">', author)[-1]
+            authors[i] = re.split('</span></a>', author)[0]
+    except:
+        authors = []
     #print("authors : " + ", ".join(authors))
     #print()
-
-    # DESCRIPTION = <div id="description" class="readable stacked" style="right:0"> </div> arasında. fakat ilk span değil, ikinci span. ikinci spande <div> ile </div> arasında. </p><p>'leri filan ignore et.
-    description_readable_stacked = re.findall('<div id="description" class="readable stacked" style="right:0">.*?<a data-text-id=".*?" href="#" onclick', myfile)[0]
-    #print(description_readable_stacked)
-    #print()
-    span = re.findall('<span id=".*?".*?</span>' , description_readable_stacked)[1] # first one is the short one
-    #print(span)
-    #print()
-    # cleaning description from tags
-    description = " ".join(re.split('<br ?/>',re.split('</span>', re.split('<span id=".*?".*?>',span)[-1])[0]))
-    # replace \xe2\x80\x99 with '
-    description = description.replace('\\xe2\\x80\\x99', '\'')
+    try:
+        # DESCRIPTION = <div id="description" class="readable stacked" style="right:0"> </div> arasında. fakat ilk span değil, ikinci span. ikinci spande <div> ile </div> arasında. </p><p>'leri filan ignore et.
+        description_readable_stacked = re.findall('<div id="description" class="readable stacked" style="right:0">.*?<a data-text-id=".*?" href="#" onclick', myfile)[0]
+        #print(description_readable_stacked)
+        #print()
+        span = re.findall('<span id=".*?".*?</span>' , description_readable_stacked)[1] # first one is the short one
+        #print(span)
+        #print()
+        # cleaning description from tags
+        description = " ".join(re.split('<br ?/>',re.split('</span>', re.split('<span id=".*?".*?>',span)[-1])[0]))
+        # replace \xe2\x80\x99 with '
+        description = description.replace('\\xe2\\x80\\x99', '\'')
+    except:
+        description = ""
     #print("Description:")
     #print(description)
     #print()
 
-    temp = re.findall('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href=".*?"><img alt="', myfile)
-    urls_of_recommended_books = []
-    for tempp in temp:
-        urls_of_recommended_books.append(re.split('"><img alt="',re.split('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href="', tempp)[-1])[0])
-
+    try:
+        temp = re.findall('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href=".*?"><img alt="', myfile)
+        urls_of_recommended_books = []
+        for tempp in temp:
+            urls_of_recommended_books.append(re.split('"><img alt="',re.split('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href="', tempp)[-1])[0])
+    except:
+        urls_of_recommended_books = []
     #print("Urls of total {} books are below:".format(len(urls_of_recommended_books)))
     #print(urls_of_recommended_books)
     return title, authors, description, urls_of_recommended_books

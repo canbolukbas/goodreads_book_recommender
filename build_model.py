@@ -9,9 +9,8 @@ import helper
 import json
 import math
 
-'''
 # extract the contents of the given urls
-filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books_small.txt"
+filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books_50.txt"
 file_book_urls = open(filepath, 'r')
 book_urls = []
 for line in file_book_urls:
@@ -28,11 +27,11 @@ f = open("parsed_book_informations.json", "w")
 json.dump(docs, f, indent=2)
 f.close()
 '''
-
 # read parsed book informations by JSON module
 f = open("parsed_book_informations.json", "r")
 parsed_book_informations = json.load(f)
 f.close()
+'''
 
 # identify terms and calculate weights
 # tf-idf weighting is a must.
