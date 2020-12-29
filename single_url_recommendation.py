@@ -83,8 +83,15 @@ for i in range(len(parsed_book_informations['books'])):
 scores_normalized = []
 for i in range(len(scores)):
     scores_normalized.append(scores[i]/(lengths[i]*lengths[current_book_id]))
-print(scores_normalized)
+#print(scores_normalized)
 # Evaluate the recommendations
 # Consider Goodreads recommendations as ground truth
 
+top18books = []
+temp = sorted(scores_normalized, key= float, reverse= True)
+for i, item in enumerate(temp):
+    if i > 17:
+        break
+    top18books.append([scores_normalized.index(item), item])
+print(top18books)
 # Output precision and average precision scores.
