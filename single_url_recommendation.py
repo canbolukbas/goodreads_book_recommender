@@ -84,14 +84,35 @@ scores_normalized = []
 for i in range(len(scores)):
     scores_normalized.append(scores[i]/(lengths[i]*lengths[current_book_id]))
 #print(scores_normalized)
-# Evaluate the recommendations
-# Consider Goodreads recommendations as ground truth
 
 top18books = []
 temp = sorted(scores_normalized, key= float, reverse= True)
 for i, item in enumerate(temp):
     if i > 17:
         break
-    top18books.append([scores_normalized.index(item), item])
-print(top18books)
+    top18books.append(scores_normalized.index(item))
+#print(top18books)
+
+# Evaluate the recommendations
+# Consider Goodreads recommendations as ground truth
+
+# To evaluate, I need their urls.
+filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books_50.txt"
+file_book_urls = open(filepath, 'r')
+book_urls = []
+for line in file_book_urls:
+    book_urls.append(line.split('\n')[0])
+file_book_urls.close()
+
+top18books_urls = []
+for book_id in top18books:
+    top18books_urls.append(book_urls[book_id].replace("\'", ""))
+print(top18books_urls)
+print()
+print(urls_of_recommended_books)
+print()
+temp = set(top18books_urls).intersection(set(urls_of_recommended_books))
+print(temp)
+
+
 # Output precision and average precision scores.
