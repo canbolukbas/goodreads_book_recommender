@@ -6,6 +6,7 @@ To-Do's:
 '''
 import helper
 import json
+import math
 
 '''
 # extract the contents of the given urls
@@ -74,6 +75,21 @@ f = open("df.json", "w")
 json.dump(document_frequency_table, f, indent=2)
 f.close()
 
+# Creating tf-idf table and saving it also.
+# w(t, d) =(1+log10tf(t,d))×log10(N/df(t))
+# tf_idf table will be in size of len(total_tokens) x len(total_documents)
+tf_idf_table = [[0 for j in range(len(parsed_book_informations['books']))] for i in range(len(term_frequency_table))] 
+for i,term in enumerate(term_frequency_table):
+    for j, book_id in enumerate(term_frequency_table[term]):
+        # since tf_table is dictionary, no entry is zero. therefore make log calculations without checking if zero.
+        # also document frequency table entries are all non-zero.
+        idf = math.log10(len(parsed_book_informations['books']) / document_frequency_table[term])
+        tf_idf_table[i][book_id] = (1 + math.log10(term_frequency_table[term][book_id])) * idf
+    
+# Save tf_idf in JSON format.
+f = open("tf_idf.json", "w")
+json.dump(tf_idf_table, f, indent=2)
+f.close()
 
 
 # Select informative words by setting min/max thresholds on freq and number of terms(or sth else)
