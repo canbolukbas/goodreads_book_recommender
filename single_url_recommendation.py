@@ -1,4 +1,12 @@
+'''
+To-Do's:
+- cosine similarity'de book genres da eklenecek
+- I've assumed given URL already exists in given builded tf-idf model Ama bu yanlış gibi ya.
+'''
+
 import helper
+import math
+import json
 
 
 # extract the content of the book whose url is given
@@ -22,12 +30,60 @@ print()
 #print(myfile)
 
 # Encode the content of the book.(vectorise I guess)
+terms = helper.normalize(description)
 
 
 # Recommend 18 books for this book with the model based on cosine similarity.
 # set alpha "reasonable"
 # formula on pdf
+# currently only description based calculation will be performed.
 
+# first lets read the tf_idf and tf models by JSON.
+f = open("tf.json", "r")
+term_frequency_table = json.load(f)
+f.close()
+
+f = open("tf_idf.json", "r")
+tf_idf_table = json.load(f)
+f.close()
+
+# check the current url's id 
+f = open("parsed_book_informations.json", "r")
+parsed_book_informations = json.load(f)
+f.close()
+
+current_book_id = -1
+for i, key in enumerate(parsed_book_informations['books']):
+    # assuming there exists no books with the same title, maybe we can add another mechanism to ensure .
+    if key['title'] == title:
+        current_book_id = i
+        break
+
+doc_vectors = [[] for _ in range(len(parsed_book_informations['books']))]
+for column in range(len(parsed_book_informations['books'])):
+    for row in range(len(tf_idf_table)):
+        doc_vectors[column].append(tf_idf_table[row][column])
+
+lengths = []
+for doc_vector in doc_vectors:
+    acc = 0
+    for val in doc_vector:
+        acc += val*val
+    length = math.sqrt(acc)
+    lengths.append(length)
+
+scores = []
+for i in range(len(parsed_book_informations['books'])):
+    curr = doc_vectors[i]
+    score = 0
+    for j in range(len(curr)):
+        score += curr[j] * doc_vectors[current_book_id][j]
+    scores.append(score)
+
+scores_normalized = []
+for i in range(len(scores)):
+    scores_normalized.append(scores[i]/(lengths[i]*lengths[current_book_id]))
+print(scores_normalized)
 # Evaluate the recommendations
 # Consider Goodreads recommendations as ground truth
 
