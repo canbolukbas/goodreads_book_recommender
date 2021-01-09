@@ -3,6 +3,7 @@ To-Do's:
 - cosine similarity'de book genres da eklenecek
 - I've assumed given URL already exists in given builded tf-idf model Ama bu yanlış gibi ya.
 - peter thiel kitabında 17 recommendation döndürdü, ama nietzsche'de 18. sıkıntı olmadı. bu neden oluyor
+- shutter island'da final ve average precision'lar patlıyor.
 '''
 
 import helper
@@ -12,7 +13,7 @@ import json
 
 # extract the content of the book whose url is given
 # title, author, description, urls of recommended books and genres
-book_url = "https://www.goodreads.com/book/show/162022.Nietzsche"
+book_url = "https://www.goodreads.com/book/show/21686.Shutter_Island"
 title, authors, description, urls_of_recommended_books = helper.parse(book_url)
 
 # output the content into terminal (I guess)
@@ -63,6 +64,7 @@ for i, key in enumerate(parsed_book_informations['books']):
 doc_vectors = [[] for _ in range(len(parsed_book_informations['books']))]
 for column in range(len(parsed_book_informations['books'])):
     for row in range(len(tf_idf_table)):
+        # assert len(tf_idf_table[row]) == len(parsed_book_informations['books'])
         doc_vectors[column].append(tf_idf_table[row][column])
 
 lengths = []
@@ -78,6 +80,7 @@ for i in range(len(parsed_book_informations['books'])):
     curr = doc_vectors[i]
     score = 0
     for j in range(len(curr)):
+        # Assumption: queried book exists in the corpus
         score += curr[j] * doc_vectors[current_book_id][j]
     scores.append(score)
 
@@ -88,6 +91,7 @@ for i in range(len(scores)):
     else:
         scores_normalized.append(scores[i]/(lengths[i]*lengths[current_book_id]))
 #print(scores_normalized)
+# assert len(scores_normalized) == len(parsed_book_informations['books'])
 
 top18books = []
 temp = sorted(scores_normalized, key= float, reverse= True)
@@ -95,23 +99,28 @@ for i, item in enumerate(temp):
     if i > 17:
         break
     top18books.append(scores_normalized.index(item))
+    # assert scores_normalized[scores_normalized.index(item)] == item
 #print(top18books)
 
 # Evaluate the recommendations
 # Consider Goodreads recommendations as ground truth
 
 # To evaluate, I need their urls.
-filepath = "/Users/cakmadam98/Desktop/4.1/CmpE493/goodreads_book_recommender/books.txt"
+filepath = "./books.txt"
 file_book_urls = open(filepath, 'r')
 book_urls = []
 for line in file_book_urls:
     book_urls.append(line.split('\n')[0])
 file_book_urls.close()
 
+print(len(book_urls))
+print(len(parsed_book_informations['books']))
+assert len(book_urls) == len(parsed_book_informations['books'])
+
 top18books_urls = []
 for book_id in top18books:
     try:
-        top18books_urls.append(book_urls[book_id].replace("\'", ""))
+        top18books_urls.append(book_urls[book_id])
     except:
         print("list index out of range error is get with following infos:")
         print("book_id : " + str(book_id))
