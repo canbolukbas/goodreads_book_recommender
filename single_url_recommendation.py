@@ -2,8 +2,6 @@
 To-Do's:
 - cosine similarity'de book genres da eklenecek
 - I've assumed given URL already exists in given builded tf-idf model Ama bu yanlış gibi ya.
-- peter thiel kitabında 17 recommendation döndürdü, ama nietzsche'de 18. sıkıntı olmadı. bu neden oluyor
-- shutter island'da final ve average precision'lar patlıyor.
 '''
 
 import helper
@@ -13,7 +11,7 @@ import json
 
 # extract the content of the book whose url is given
 # title, author, description, urls of recommended books and genres
-book_url = "https://www.goodreads.com/book/show/21686.Shutter_Island"
+book_url = "https://www.goodreads.com/book/show/18288.Critique_of_Pure_Reason"
 title, authors, description, urls_of_recommended_books = helper.parse(book_url)
 
 # output the content into terminal (I guess)
@@ -64,7 +62,7 @@ for i, key in enumerate(parsed_book_informations['books']):
 doc_vectors = [[] for _ in range(len(parsed_book_informations['books']))]
 for column in range(len(parsed_book_informations['books'])):
     for row in range(len(tf_idf_table)):
-        # assert len(tf_idf_table[row]) == len(parsed_book_informations['books'])
+        assert len(tf_idf_table[row]) == len(parsed_book_informations['books'])
         doc_vectors[column].append(tf_idf_table[row][column])
 
 lengths = []
@@ -91,7 +89,7 @@ for i in range(len(scores)):
     else:
         scores_normalized.append(scores[i]/(lengths[i]*lengths[current_book_id]))
 #print(scores_normalized)
-# assert len(scores_normalized) == len(parsed_book_informations['books'])
+assert len(scores_normalized) == len(parsed_book_informations['books'])
 
 top18books = []
 temp = sorted(scores_normalized, key= float, reverse= True)
@@ -113,33 +111,31 @@ for line in file_book_urls:
     book_urls.append(line.split('\n')[0])
 file_book_urls.close()
 
-print(len(book_urls))
-print(len(parsed_book_informations['books']))
+# print(len(book_urls))
+# print(len(parsed_book_informations['books']))
 assert len(book_urls) == len(parsed_book_informations['books'])
 
 top18books_urls = []
 for book_id in top18books:
-    try:
         top18books_urls.append(book_urls[book_id])
-    except:
-        print("list index out of range error is get with following infos:")
-        print("book_id : " + str(book_id))
-        print("len of book_urls: " + str(len(book_urls)))
+
 #print(top18books_urls)
 #print()
 #print(urls_of_recommended_books)
 #print()
 precision_acc = 0
 counter = 0
-for i, url in enumerate(urls_of_recommended_books):
-    if url in set(top18books_urls):
+for i, url in enumerate(top18books_urls):
+    if url in set(urls_of_recommended_books):
         counter += 1
         precision_acc += counter / (i+1)
 
-
+print("Intersection: ")
+print(set(top18books_urls).intersection(set(urls_of_recommended_books)))
+print()
 final_precision = len(set(top18books_urls).intersection(set(urls_of_recommended_books))) / len(top18books_urls)
 if counter != 0:
-    average_precision = precision_acc / counter
+    average_precision = precision_acc / len(urls_of_recommended_books)
 else:
     average_precision = 0
 
