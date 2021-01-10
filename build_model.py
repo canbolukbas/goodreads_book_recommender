@@ -9,7 +9,7 @@ import helper
 import json
 import math
 
-'''
+
 # extract the contents of the given urls
 filepath = "./books.txt"
 file_book_urls = open(filepath, 'r')
@@ -21,11 +21,11 @@ file_book_urls.close()
 docs = {"books": []}
 for book_url in book_urls:
     try:
-        title, author, description, urls_of_recommended_books = helper.parse(book_url)
+        title, author, description, urls_of_recommended_books, genres = helper.parse(book_url)
     except:
-        docs['books'].append({'title': "", 'author': [], 'description': "", 'urls_of_recommended_books': []})
+        docs['books'].append({'title': "", 'author': [], 'description': "", 'urls_of_recommended_books': [], 'genres': []})
     else:
-        docs['books'].append({'title': title, 'author': author, 'description': description, 'urls_of_recommended_books': urls_of_recommended_books})
+        docs['books'].append({'title': title, 'author': author, 'description': description, 'urls_of_recommended_books': urls_of_recommended_books, 'genres': genres})
 
 # Save the contents in JSON format.
 f = open("parsed_book_informations.json", "w")
@@ -94,7 +94,7 @@ for i,term in enumerate(term_frequency_table):
 f = open("tf_idf.json", "w")
 json.dump(tf_idf_table, f, indent=2)
 f.close()
-
+'''
 
 # Select informative words by setting min/max thresholds on freq and number of terms(or sth else)
 # Encode each book's description by using the occurences and scores of these informative words

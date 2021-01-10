@@ -1,13 +1,24 @@
 '''
 To-Do's:
 - \\xe2\\x80\\x99 problem is solved. But other may emerge.
-- Genres will be added later.
 - Informer kitabından span 1 olduğu için patlıyor.
 '''
 
 import urllib.request
 import re
 import string
+
+def genre_parser(text):
+    try:
+        lines = re.findall('<a class="actionLinkLite bookPageGenreLink" href=".*?">.*?</a>', text)
+        result = []
+        for line in lines:
+            result.append(re.split('<a class="actionLinkLite bookPageGenreLink" href=".*?">', line)[-1].split("</a>")[0])
+    except:
+        return []
+    else:
+        # print(result)
+        return result
 
 def parse(url: str):
 
@@ -67,9 +78,12 @@ def parse(url: str):
             urls_of_recommended_books.append(re.split('"><img alt="',re.split('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href="', tempp)[-1])[0])
     except:
         urls_of_recommended_books = []
+
+    # Parsing genres
+    genres = genre_parser(myfile)
     #print("Urls of total {} books are below:".format(len(urls_of_recommended_books)))
     #print(urls_of_recommended_books)
-    return title, authors, description, urls_of_recommended_books
+    return title, authors, description, urls_of_recommended_books, genres
 
 def normalize(text):
 
