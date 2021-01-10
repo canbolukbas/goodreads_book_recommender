@@ -8,6 +8,24 @@ import helper
 import math
 import json
 
+def calculate_jaqqard(l1, l2):
+    s1 = set(l1)
+    s2 = set(l2)
+    if len(s1.union(s2)) == 0:
+        return 0
+    return (len(s1.intersection(s2)) / len(s1.union(s2)))
+
+def get_jaqqard_coeff():
+    # genres: current book genres
+    # parsed_book_informations: corpus information
+    jaq_coeffs = []
+    for book_id, book_info in enumerate(parsed_book_informations['books']):
+        other_genres = book_info.get('genres')
+        # assert len(other_genres) != 0   There are 4 books that have no genre information.
+        jaq_coeffs.append(calculate_jaqqard(genres, other_genres))
+        # print(parsed_book_informations['books'][book_id]['title'] + " has Jaqqard coefficient of " + str(jaq_coeffs[book_id]))
+    
+    return jaq_coeffs
 
 # extract the content of the book whose url is given
 # title, author, description, urls of recommended books and genres
@@ -54,6 +72,9 @@ f.close()
 f = open("parsed_book_informations.json", "r")
 parsed_book_informations = json.load(f)
 f.close()
+
+# get Jaqqard coefficient with each book.
+jaqqard_coefficients_of_books = get_jaqqard_coeff()
 
 current_book_id = -1
 for i, key in enumerate(parsed_book_informations['books']):
