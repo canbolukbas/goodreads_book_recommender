@@ -12,7 +12,7 @@ import json
 # extract the content of the book whose url is given
 # title, author, description, urls of recommended books and genres
 book_url = "https://www.goodreads.com/book/show/18288.Critique_of_Pure_Reason"
-title, authors, description, urls_of_recommended_books = helper.parse(book_url)
+title, authors, description, urls_of_recommended_books, genres = helper.parse(book_url)
 
 # output the content into terminal (I guess)
 print("title: " + title)
@@ -26,6 +26,9 @@ print()
 print("urls of recommended books:")
 for url in urls_of_recommended_books:
     print(url)
+print()
+print("Genres: ")
+print(", ".join(genres))
 print()
 #print(myfile)
 

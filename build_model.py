@@ -9,7 +9,7 @@ import helper
 import json
 import math
 
-
+'''
 # extract the contents of the given urls
 filepath = "./books.txt"
 file_book_urls = open(filepath, 'r')
@@ -94,7 +94,6 @@ for i,term in enumerate(term_frequency_table):
 f = open("tf_idf.json", "w")
 json.dump(tf_idf_table, f, indent=2)
 f.close()
-'''
 
 # Select informative words by setting min/max thresholds on freq and number of terms(or sth else)
 # Encode each book's description by using the occurences and scores of these informative words
