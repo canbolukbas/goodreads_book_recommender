@@ -27,6 +27,18 @@ def get_jaqqard_coeff():
     
     return jaq_coeffs
 
+def get_book_similarity():
+    # jaqqard_coefficients_of_books
+    # scores_normalized
+
+    alpha = 0.5
+    
+    combined_scores = []
+    assert len(scores_normalized) == len(jaqqard_coefficients_of_books)
+    for i in range(len(scores_normalized)):
+        combined_scores.append(alpha*scores_normalized[i] + (1-alpha)*jaqqard_coefficients_of_books[i])
+    return combined_scores
+
 # extract the content of the book whose url is given
 # title, author, description, urls of recommended books and genres
 book_url = "https://www.goodreads.com/book/show/18288.Critique_of_Pure_Reason"
@@ -115,12 +127,15 @@ for i in range(len(scores)):
 #print(scores_normalized)
 assert len(scores_normalized) == len(parsed_book_informations['books'])
 
+# combine genre based and description based similarities
+combined_scores = get_book_similarity()
+
 top18books = []
-temp = sorted(scores_normalized, key= float, reverse= True)
+temp = sorted(combined_scores, key= float, reverse= True)
 for i, item in enumerate(temp):
     if i > 17:
         break
-    top18books.append(scores_normalized.index(item))
+    top18books.append(combined_scores.index(item))
     # assert scores_normalized[scores_normalized.index(item)] == item
 #print(top18books)
 
