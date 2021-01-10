@@ -4,7 +4,7 @@ To-Do's:
 - genres should be vectorized diyor descriptionda
 '''
 
-import helper
+from helper import *
 import math
 import json
 
@@ -89,7 +89,7 @@ def get_cosine_similarity_scores():
     # Normalize dot product values.
     scores_normalized = []
     for i in range(len(scores)):
-        if lengths[i]==0:
+        if lengths[i]==0 or lengths[current_book_id]==0:
             scores_normalized.append(0)
         else:
             scores_normalized.append(scores[i]/(lengths[i]*lengths[current_book_id]))
@@ -160,28 +160,20 @@ def get_book_similarity():
 
 # MAIN
 
-# extract the content of the book whose url is given
+# Extract the content of the book whose url is given
 book_url = "https://www.goodreads.com/book/show/18498576-inside-divergent"
-title, authors, description, urls_of_recommended_books, genres = helper.parse(book_url)
+title, authors, description, urls_of_recommended_books, genres = parse(book_url)
 
 # Print the book content 
 print_book_content()
 
-# Perform tokenization and normalization
-terms = helper.normalize(description)
+# Perform tokenization and normalization for description.
+terms = normalize(description)
 
 # Read JSON files.
-f = open("tf.json", "r")
-term_frequency_table = json.load(f)
-f.close()
-
-f = open("tf_idf.json", "r")
-tf_idf_table = json.load(f)
-f.close()
- 
-f = open("parsed_book_informations.json", "r")
-parsed_book_informations = json.load(f)
-f.close()
+term_frequency_table = json_reader("tf.json")
+tf_idf_table = json_reader("tf_idf.json")
+parsed_book_informations = json_reader("parsed_book_informations.json")
 
 # Get Jaqqard coefficient of each book based on "Genres".
 jaqqard_coefficients_of_books = get_jaqqard_coeff()

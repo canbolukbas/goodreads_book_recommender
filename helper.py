@@ -7,6 +7,33 @@ To-Do's:
 import urllib.request
 import re
 import string
+import json
+
+def json_reader(path: str):
+    f = open(path, "r")
+    text = json.load(f)
+    f.close()
+    return text
+
+def json_saver(path: str, file: str):
+    # Save df in JSON format.
+    f = open(path, "w")
+    json.dump(file, f, indent=2)
+    f.close()
+
+def authors_parser(myfile):
+    try:
+        # AUTHOR = <a class="authorName" itemprop="url" href=.*><span itemprop="name">.*</span></a>
+        authors = re.findall('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">.*?</span></a>', myfile)
+        for i in range(len(authors)):
+            author = authors[i]
+            author = re.split('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">', author)[-1]
+            authors[i] = re.split('</span></a>', author)[0]
+    except:
+        authors = []
+    #print("authors : " + ", ".join(authors))
+    #print()
+    return authors
 
 def genre_parser(text):
     try:
@@ -20,18 +47,7 @@ def genre_parser(text):
         # print(result)
         return result
 
-def parse(url: str):
-
-    f = urllib.request.urlopen(url)
-    myfile = str(f.read())
-    f.close()
-    #print(type(myfile))
-    '''
-    f = open("test.txt", "r")
-    myfile = f.read()
-    f.close()
-    '''
-
+def title_parser(myfile):
     # calculations on myfile
     # TITLE = <h1 id="bookTitle" class="gr-h1 gr-h1--serif" itemprop="name">\n ....... \n</h1>
     try:
@@ -41,18 +57,9 @@ def parse(url: str):
     
     #print("title: " + title)
     #print()
+    return title
 
-    try:
-        # AUTHOR = <a class="authorName" itemprop="url" href=.*><span itemprop="name">.*</span></a>
-        authors = re.findall('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">.*?</span></a>', myfile)
-        for i in range(len(authors)):
-            author = authors[i]
-            author = re.split('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">', author)[-1]
-            authors[i] = re.split('</span></a>', author)[0]
-    except:
-        authors = []
-    #print("authors : " + ", ".join(authors))
-    #print()
+def description_parser(myfile):
     try:
         # DESCRIPTION = <div id="description" class="readable stacked" style="right:0"> </div> arasında. fakat ilk span değil, ikinci span. ikinci spande <div> ile </div> arasında. </p><p>'leri filan ignore et.
         description_readable_stacked = re.findall('<div id="description" class="readable stacked" style="right:0">.*?<a data-text-id=".*?" href="#" onclick', myfile)[0]
@@ -70,7 +77,9 @@ def parse(url: str):
     #print("Description:")
     #print(description)
     #print()
+    return description
 
+def recommendations_parser(myfile):
     try:
         temp = re.findall('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href=".*?"><img alt="', myfile)
         urls_of_recommended_books = []
@@ -78,11 +87,23 @@ def parse(url: str):
             urls_of_recommended_books.append(re.split('"><img alt="',re.split('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href="', tempp)[-1])[0])
     except:
         urls_of_recommended_books = []
+    
+    return urls_of_recommended_books
 
-    # Parsing genres
+def parse(url: str):
+
+    # Get url content and store it as a string.
+    f = urllib.request.urlopen(url)
+    myfile = str(f.read())
+    f.close()
+
+    # Parse book contents
+    title = title_parser(myfile)
+    authors = authors_parser(myfile)
+    description = description_parser(myfile)
+    urls_of_recommended_books = recommendations_parser(myfile)
     genres = genre_parser(myfile)
-    #print("Urls of total {} books are below:".format(len(urls_of_recommended_books)))
-    #print(urls_of_recommended_books)
+
     return title, authors, description, urls_of_recommended_books, genres
 
 def normalize(text):
