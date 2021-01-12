@@ -29,11 +29,11 @@ def create_parsed_book_informations_json():
     # Save the contents in JSON format.
     json_saver("parsed_book_informations.json", docs)
 
-def get_tf_df_tables():
+def get_tf_df_tables(chosen_column_as_data):
     term_frequency_table = dict()
     document_frequency_table = dict()
     for book_id, book_info in enumerate(parsed_book_informations['books']):
-        doc = book_info['description']
+        doc = book_info[chosen_column_as_data]
         tokens = normalize(doc)
 
         # Construct document freq.(df) table.
@@ -58,7 +58,7 @@ def get_tf_df_tables():
     
     return term_frequency_table, document_frequency_table
 
-def get_tf_idf_table():
+def get_tf_idf_table(term_frequency_table, document_frequency_table):
     # w(t, d) =(1+log10tf(t,d))×log10(N/df(t))
     # tf_idf table will be in size of len(total_tokens) x len(total_documents)
     tf_idf_table = [[0 for j in range(len(parsed_book_informations['books']))] for i in range(len(term_frequency_table))] 
@@ -86,20 +86,23 @@ else:
 # read parsed book informations by JSON module
 parsed_book_informations = json_reader("parsed_book_informations.json")
 
-# Identify term and inverse document frequencies.
-term_frequency_table, document_frequency_table = get_tf_df_tables()
+# Identify term and inverse document frequencies for book descriptions.
+term_frequency_table, document_frequency_table = get_tf_df_tables("description")
+
+# Identify term and inverse document frequecies for book genres.
+#tf_idf_table = get_tf_idf_table_for_book_genres(parsed_book_informations)
 
 # Save tf in JSON format.
-json_saver("tf.json", term_frequency_table)
+# json_saver("tf.json", term_frequency_table)
 
 # Save df in JSON format.
-json_saver("df.json", document_frequency_table)
+#json_saver("df.json", document_frequency_table)
 
 # Creating tf-idf table.
-tf_idf_table = get_tf_idf_table()
+tf_idf_table_for_description = get_tf_idf_table(term_frequency_table, document_frequency_table)
     
 # Save tf_idf in JSON format.
-json_saver("tf_idf.json", tf_idf_table)
+json_saver("tf_idf.json", tf_idf_table_for_description)
 
 # Select informative words by setting min/max thresholds on freq and number of terms(or sth else)
 # Encode each book's description by using the occurences and scores of these informative words

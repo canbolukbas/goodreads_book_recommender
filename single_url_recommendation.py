@@ -171,7 +171,7 @@ print_book_content()
 terms = normalize(description)
 
 # Read JSON files.
-term_frequency_table = json_reader("tf.json")
+term_frequency_table = json_reader("tf.json") # No need probably. No need to save as JSON also (maybe).
 tf_idf_table = json_reader("tf_idf.json")
 parsed_book_informations = json_reader("parsed_book_informations.json")
 
