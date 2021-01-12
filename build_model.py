@@ -34,7 +34,11 @@ def get_tf_df_tables(chosen_column_as_data):
     document_frequency_table = dict()
     for book_id, book_info in enumerate(parsed_book_informations['books']):
         doc = book_info[chosen_column_as_data]
-        tokens = normalize(doc)
+        if chosen_column_as_data == "description":
+            tokens = normalize(doc)
+        else:
+            # Adding normalization for genres ?
+            tokens = doc
 
         # Construct document freq.(df) table.
         # df represents the number of documents a term appears on.
@@ -87,22 +91,22 @@ else:
 parsed_book_informations = json_reader("parsed_book_informations.json")
 
 # Identify term and inverse document frequencies for book descriptions.
-term_frequency_table, document_frequency_table = get_tf_df_tables("description")
+tf_description, df_description = get_tf_df_tables("description")
 
-# Identify term and inverse document frequecies for book genres.
-#tf_idf_table = get_tf_idf_table_for_book_genres(parsed_book_informations)
-
-# Save tf in JSON format.
-# json_saver("tf.json", term_frequency_table)
-
-# Save df in JSON format.
-#json_saver("df.json", document_frequency_table)
-
-# Creating tf-idf table.
-tf_idf_table_for_description = get_tf_idf_table(term_frequency_table, document_frequency_table)
+# Creating tf-idf table for book descriptions.
+tf_idf_table_for_description = get_tf_idf_table(tf_description, df_description)
     
 # Save tf_idf in JSON format.
-json_saver("tf_idf.json", tf_idf_table_for_description)
+json_saver("tf_idf_description.json", tf_idf_table_for_description)
+
+# Identify term and inverse document frequecies for book genres.
+tf_genres, df_genres = get_tf_df_tables("genres")
+
+# Creating tf-idf table for book descriptions.
+tf_idf_table_for_genres = get_tf_idf_table(tf_genres, df_genres)
+    
+# Save tf_idf in JSON format.
+json_saver("tf_idf_genres.json", tf_idf_table_for_genres)
 
 # Select informative words by setting min/max thresholds on freq and number of terms(or sth else)
 # Encode each book's description by using the occurences and scores of these informative words
