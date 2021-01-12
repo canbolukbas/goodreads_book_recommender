@@ -58,7 +58,7 @@ def get_recommendations():
     #print(top18books)
     return top18books
 
-def get_cosine_similarity_scores():
+def get_cosine_similarity_scores(tf_idf_table, current_book_id, chosen_column_as_data):
 
     # Get Document Vectors from TF-IDF table.
     doc_vectors = [[] for _ in range(len(parsed_book_informations['books']))]
@@ -126,35 +126,16 @@ def print_book_content():
     print(", ".join(genres))
     print()
 
-def calculate_jaqqard(l1, l2):
-    s1 = set(l1)
-    s2 = set(l2)
-    if len(s1.union(s2)) == 0:
-        return 0
-    return (len(s1.intersection(s2)) / len(s1.union(s2)))
-
-def get_jaqqard_coeff():
-    # genres: current book genres
-    # parsed_book_informations: corpus information
-    jaq_coeffs = []
-    for book_id, book_info in enumerate(parsed_book_informations['books']):
-        other_genres = book_info.get('genres')
-        # assert len(other_genres) != 0   There are 4 books that have no genre information.
-        jaq_coeffs.append(calculate_jaqqard(genres, other_genres))
-        # print(parsed_book_informations['books'][book_id]['title'] + " has Jaqqard coefficient of " + str(jaq_coeffs[book_id]))
-    
-    return jaq_coeffs
-
-def get_book_similarity():
+def get_book_similarity(scores_normalized, scores_normalized_genres):
     # jaqqard_coefficients_of_books
     # scores_normalized
 
     alpha = 0.8
     
     combined_scores = []
-    assert len(scores_normalized) == len(jaqqard_coefficients_of_books)
+    assert len(scores_normalized) == len(scores_normalized_genres)
     for i in range(len(scores_normalized)):
-        combined_scores.append(alpha*scores_normalized[i] + (1-alpha)*jaqqard_coefficients_of_books[i])
+        combined_scores.append(alpha*scores_normalized[i] + (1-alpha)*scores_normalized_genres[i])
     return combined_scores
 
 
@@ -175,17 +156,17 @@ tf_idf_table = json_reader("tf_idf_description.json")
 tf_idf_table_genres = json_reader("tf_idf_genres.json")
 parsed_book_informations = json_reader("parsed_book_informations.json")
 
-# Get Jaqqard coefficient of each book based on "Genres".
-jaqqard_coefficients_of_books = get_jaqqard_coeff()
-
 # Get Current Book's ID
 current_book_id = get_current_book_id()
 
 # Get Cosine Similarity scores of each book based on "Description"
-scores_normalized = get_cosine_similarity_scores()
+scores_normalized = get_cosine_similarity_scores(tf_idf_table, current_book_id, "description")
+
+# Get Cosine Similarity scores of each book based on "Genres"
+scores_normalized_genres = get_cosine_similarity_scores(tf_idf_table_genres, current_book_id, "genres")
 
 # combine genre based and description based similarities
-combined_scores = get_book_similarity()
+combined_scores = get_book_similarity(scores_normalized, scores_normalized_genres)
 
 # Recommend 18 books based on combined_scores.
 top18books = get_recommendations()
