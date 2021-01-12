@@ -1,7 +1,6 @@
 '''
 To-Do's:
 - I've assumed given URL already exists in given builded tf-idf model Ama bu yanlış gibi ya.
-- genres should be vectorized diyor descriptionda
 '''
 
 from helper import *
