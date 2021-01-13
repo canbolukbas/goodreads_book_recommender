@@ -137,11 +137,84 @@ def get_book_similarity(scores_normalized, scores_normalized_genres):
         combined_scores.append(alpha*scores_normalized[i] + (1-alpha)*scores_normalized_genres[i])
     return combined_scores
 
+def calculate_query_term_weight(term, query, df):
+    counter = 0
+    # Doing this for every term is very inefficient.
+    for qt in query:
+        if qt == term:
+            counter += 1
+    
+    if term not in df:
+        return (1 + math.log10(counter))* math.log10(len(parsed_book_informations['books']))
+    else:
+        return (1 + math.log10(counter))* (math.log10(len(parsed_book_informations['books']) / (1 + df[term])))
+    
+def calc_lengths(arrs):
+    lengths = []
+    for arr in arrs:
+        acc = 0
+        for i in arr:
+            acc += i*i
+        lengths.append(math.sqrt(acc))
+    return lengths
+
+def get_normalized_scores(vector):
+    N = len(vector)
+    length = calc_lengths(vector)
+    normalized_vector = []
+    assert len(length) == N
+    for i in range(N):
+        normalized_vector.append(vector[i]/length[i])
+    return normalized_vector
+
+def get_term_index_from_df(term, df):
+    terms = list(df.keys())
+    return terms.index(term)
+
+def calculate_document_vectors(query, tfidf, df):
+    document_vectors = [[] for i in range(len(parsed_book_informations['books']))]
+    for i, term in enumerate(query):
+        # if term does not exist in the corpus, ignore. Move to another term.
+        if term not in list(df.keys()):
+            continue
+        for book_id, tfidf_value in enumerate(tfidf[get_term_index_from_df(term, df)]):
+            document_vectors[book_id].append(tfidf_value)
+    return document_vectors
+        
+def get_normalized_scores_new(scores, vector_lengths, query_length):
+    assert len(scores) == len(vector_lengths)
+    normalized_scores = []
+    for i in range(len(scores)):
+        # Try/Except usage is not a solid solution. Can be improved.
+        try:
+            normalized_scores.append(scores[i]/(vector_lengths[i]* query_length))
+        except:
+            normalized_scores.append(0)
+    return normalized_scores
+
+def get_cosine_similarity_scores_new(tfidf, df, query):
+    scores = [0 for i in range(len(parsed_book_informations['books']))]
+    query_term_weight_list = []
+    for term in query:
+        query_term_weight = calculate_query_term_weight(term, query, df)
+        query_term_weight_list.append(query_term_weight)
+        # This is due to usage of 2D array for tf-idf instead of a dict.
+        # Check if the term exists in the Corpus, if doesn't exists continue
+        if term not in list(df.keys()):
+            continue
+        term_index = get_term_index_from_df(term, df)
+        for i, weight in enumerate(tfidf[term_index]):
+            scores[i]+=(weight * query_term_weight)
+    
+    query_length = calc_lengths([query_term_weight_list])[0]
+    document_vectors = calculate_document_vectors(query, tfidf, df)
+    document_vector_lengths = calc_lengths(document_vectors)
+    return get_normalized_scores_new(scores, document_vector_lengths, query_length)
 
 # MAIN
 
 # Extract the content of the book whose url is given
-book_url = "https://www.goodreads.com/book/show/18498576-inside-divergent"
+book_url = "https://www.goodreads.com/book/show/18288.Critique_of_Pure_Reason"
 title, authors, description, urls_of_recommended_books, genres = parse(book_url)
 
 # Print the book content 
@@ -152,11 +225,19 @@ terms = normalize(description)
 
 # Read JSON files.
 tf_idf_table = json_reader("tf_idf_description.json")
+df_description = json_reader("df_description.json")
 tf_idf_table_genres = json_reader("tf_idf_genres.json")
+df_genres = json_reader("df_genres.json")
 parsed_book_informations = json_reader("parsed_book_informations.json")
 
 # Get Current Book's ID
 current_book_id = get_current_book_id()
+
+# Get Cosine Similarity scores of books based on "Description"
+scores_normalized_description_new = get_cosine_similarity_scores_new(tf_idf_table, df_description, terms)
+
+# Get Cosine Similarity scores of books based on "Genres"
+scores_normalized_genres_new = get_cosine_similarity_scores_new(tf_idf_table_genres, df_genres, genres)
 
 # Get Cosine Similarity scores of each book based on "Description"
 scores_normalized = get_cosine_similarity_scores(tf_idf_table, current_book_id, "description")
@@ -165,7 +246,8 @@ scores_normalized = get_cosine_similarity_scores(tf_idf_table, current_book_id, 
 scores_normalized_genres = get_cosine_similarity_scores(tf_idf_table_genres, current_book_id, "genres")
 
 # combine genre based and description based similarities
-combined_scores = get_book_similarity(scores_normalized, scores_normalized_genres)
+# combined_scores = get_book_similarity(scores_normalized, scores_normalized_genres)
+combined_scores = get_book_similarity(scores_normalized_description_new, scores_normalized_genres_new)
 
 # Recommend 18 books based on combined_scores.
 top18books = get_recommendations()
