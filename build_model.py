@@ -99,6 +99,9 @@ tf_idf_table_for_description = get_tf_idf_table(tf_description, df_description)
 # Save tf_idf in JSON format.
 json_saver("tf_idf_description.json", tf_idf_table_for_description)
 
+# Save df in in JSON format
+json_saver("df_description.json", df_description)
+
 # Identify term and inverse document frequecies for book genres.
 tf_genres, df_genres = get_tf_df_tables("genres")
 
@@ -107,6 +110,9 @@ tf_idf_table_for_genres = get_tf_idf_table(tf_genres, df_genres)
     
 # Save tf_idf in JSON format.
 json_saver("tf_idf_genres.json", tf_idf_table_for_genres)
+
+# Save df in in JSON format
+json_saver("df_genres.json", df_genres)
 
 # Select informative words by setting min/max thresholds on freq and number of terms(or sth else)
 # Encode each book's description by using the occurences and scores of these informative words
