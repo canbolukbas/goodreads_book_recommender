@@ -50,7 +50,9 @@ def get_tf_df_tables(chosen_column_as_data):
                 
         # Construct term freq.(tf) table.
         # tf represents number of times a term appears on each document.
-        for token in tokens:
+        # Sorting is necessary for checking the index of a term in single_url_recommendation/get_term_index_from_tfidf()
+        ordered_tokens = sorted(tokens)
+        for token in ordered_tokens:
 
             if token in term_frequency_table:
                 if book_id in term_frequency_table[token]:
