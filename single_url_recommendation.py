@@ -1,6 +1,6 @@
 '''
 To-Do's:
-- I've assumed given URL already exists in given builded tf-idf model Ama bu yanlış gibi ya.
+- Too low accuracy.
 '''
 
 from helper import *
@@ -16,18 +16,12 @@ def evaluate():
         book_urls.append(line.split('\n')[0])
     file_book_urls.close()
 
-    # print(len(book_urls))
-    # print(len(parsed_book_informations['books']))
     assert len(book_urls) == len(parsed_book_informations['books'])
 
     top18books_urls = []
     for book_id in top18books:
             top18books_urls.append(book_urls[book_id])
 
-    #print(top18books_urls)
-    #print()
-    #print(urls_of_recommended_books)
-    #print()
     precision_acc = 0
     counter = 0
     for i, url in enumerate(top18books_urls):
@@ -57,56 +51,6 @@ def get_recommendations():
     #print(top18books)
     return top18books
 
-def get_cosine_similarity_scores(tf_idf_table, current_book_id, chosen_column_as_data):
-
-    # Get Document Vectors from TF-IDF table.
-    doc_vectors = [[] for _ in range(len(parsed_book_informations['books']))]
-    for column in range(len(parsed_book_informations['books'])):
-        for row in range(len(tf_idf_table)):
-            assert len(tf_idf_table[row]) == len(parsed_book_informations['books'])
-            doc_vectors[column].append(tf_idf_table[row][column])
-
-    # Calculate length of vectors
-    lengths = []
-    for doc_vector in doc_vectors:
-        acc = 0
-        for val in doc_vector:
-            acc += val*val
-        length = math.sqrt(acc)
-        lengths.append(length)
-
-    # Calculate dot product of vector pairs.
-    scores = []
-    for i in range(len(parsed_book_informations['books'])):
-        curr = doc_vectors[i]
-        score = 0
-        for j in range(len(curr)):
-            # Assumption: queried book exists in the corpus
-            score += curr[j] * doc_vectors[current_book_id][j]
-        scores.append(score)
-
-    # Normalize dot product values.
-    scores_normalized = []
-    for i in range(len(scores)):
-        if lengths[i]==0 or lengths[current_book_id]==0:
-            scores_normalized.append(0)
-        else:
-            scores_normalized.append(scores[i]/(lengths[i]*lengths[current_book_id]))
-    #print(scores_normalized)
-    assert len(scores_normalized) == len(parsed_book_informations['books'])
-
-    return scores_normalized
-
-def get_current_book_id():
-    current_book_id = -1
-    for i, key in enumerate(parsed_book_informations['books']):
-        # assuming there exists no books with the same title, maybe we can add another mechanism to ensure .
-        if key['title'] == title:
-            current_book_id = i
-            break
-    
-    return current_book_id
-
 def print_book_content():
 
     print("title: " + title)
@@ -129,7 +73,7 @@ def get_book_similarity(scores_normalized, scores_normalized_genres):
     # jaqqard_coefficients_of_books
     # scores_normalized
 
-    alpha = 0.8
+    alpha = 0.5
     
     combined_scores = []
     assert len(scores_normalized) == len(scores_normalized_genres)
@@ -157,15 +101,6 @@ def calc_lengths(arrs):
             acc += i*i
         lengths.append(math.sqrt(acc))
     return lengths
-
-def get_normalized_scores(vector):
-    N = len(vector)
-    length = calc_lengths(vector)
-    normalized_vector = []
-    assert len(length) == N
-    for i in range(N):
-        normalized_vector.append(vector[i]/length[i])
-    return normalized_vector
 
 def get_term_index_from_df(term, df):
     terms = list(df.keys())
@@ -201,6 +136,7 @@ def get_cosine_similarity_scores_new(tfidf, df, query):
         # This is due to usage of 2D array for tf-idf instead of a dict.
         # Check if the term exists in the Corpus, if doesn't exists continue
         if term not in list(df.keys()):
+            print(term)
             continue
         term_index = get_term_index_from_df(term, df)
         for i, weight in enumerate(tfidf[term_index]):
@@ -230,23 +166,13 @@ tf_idf_table_genres = json_reader("tf_idf_genres.json")
 df_genres = json_reader("df_genres.json")
 parsed_book_informations = json_reader("parsed_book_informations.json")
 
-# Get Current Book's ID
-current_book_id = get_current_book_id()
-
 # Get Cosine Similarity scores of books based on "Description"
 scores_normalized_description_new = get_cosine_similarity_scores_new(tf_idf_table, df_description, terms)
 
 # Get Cosine Similarity scores of books based on "Genres"
 scores_normalized_genres_new = get_cosine_similarity_scores_new(tf_idf_table_genres, df_genres, genres)
 
-# Get Cosine Similarity scores of each book based on "Description"
-scores_normalized = get_cosine_similarity_scores(tf_idf_table, current_book_id, "description")
-
-# Get Cosine Similarity scores of each book based on "Genres"
-scores_normalized_genres = get_cosine_similarity_scores(tf_idf_table_genres, current_book_id, "genres")
-
 # combine genre based and description based similarities
-# combined_scores = get_book_similarity(scores_normalized, scores_normalized_genres)
 combined_scores = get_book_similarity(scores_normalized_description_new, scores_normalized_genres_new)
 
 # Recommend 18 books based on combined_scores.
