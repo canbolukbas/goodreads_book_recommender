@@ -1,6 +1,6 @@
 '''
 To-Do's:
-- Too low accuracy.
+- Output will be changed
 '''
 
 from helper import *
@@ -136,7 +136,7 @@ def get_cosine_similarity_scores_new(tfidf, df, query):
         # This is due to usage of 2D array for tf-idf instead of a dict.
         # Check if the term exists in the Corpus, if doesn't exists continue
         if term not in list(df.keys()):
-            print(term)
+            # print(term)
             continue
         term_index = get_term_index_from_df(term, df)
         for i, weight in enumerate(tfidf[term_index]):
@@ -150,7 +150,7 @@ def get_cosine_similarity_scores_new(tfidf, df, query):
 # MAIN
 
 # Extract the content of the book whose url is given
-book_url = "https://www.goodreads.com/book/show/18288.Critique_of_Pure_Reason"
+book_url = "https://www.goodreads.com/book/show/31423133-make-your-bed"
 title, authors, description, urls_of_recommended_books, genres = parse(book_url)
 
 # Print the book content 
