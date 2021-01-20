@@ -23,9 +23,9 @@ def create_parsed_book_informations_json(book_urls_file):
         try:
             title, author, description, urls_of_recommended_books, genres = parse(book_url)
         except:
-            docs['books'].append({'title': "", 'author': [], 'description': "", 'urls_of_recommended_books': [], 'genres': []})
+            docs['books'].append({'title': "", 'author': [], 'description': "", 'urls_of_recommended_books': [], 'genres': [], 'url': book_url})
         else:
-            docs['books'].append({'title': title, 'author': author, 'description': description, 'urls_of_recommended_books': urls_of_recommended_books, 'genres': genres})
+            docs['books'].append({'title': title, 'author': author, 'description': description, 'urls_of_recommended_books': urls_of_recommended_books, 'genres': genres, 'url': book_url})
 
     # Save the contents in JSON format.
     json_saver("parsed_book_informations.json", docs)
