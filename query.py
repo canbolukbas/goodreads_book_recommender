@@ -1,13 +1,15 @@
 import sys
+import os
 
 def single_url_recommendation(path):
-    pass
+    os.system("python single_url_recommendation.py {}".format(path))
 
 def build_model(path):
-    pass
+    os.system("python build_model.py {}".format(path))
 
 def is_url(path):
-    pass
+    if path[:5]=="https":
+        return True
 
 path = sys.argv[1]
 if is_url(path):

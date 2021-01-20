@@ -1,11 +1,12 @@
 '''
 To-Do's:
-- Output will be changed
+- Evaluate() function contains filepath, but it shouldn't. This file can't have that information.
 '''
 
 from helper import *
 import math
 import json
+import sys
 
 def evaluate():
     # To evaluate, I need their urls.
@@ -167,7 +168,7 @@ def print_books(book_id_arr):
 # MAIN
 if __name__ == "__main__":
     # Extract the content of the book whose url is given
-    book_url = "https://www.goodreads.com/book/show/31423133-make-your-bed"
+    book_url = sys.argv[1]
     title, authors, description, urls_of_recommended_books, genres = parse(book_url)
 
     # Print the book content 
