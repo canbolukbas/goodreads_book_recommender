@@ -6,11 +6,12 @@ from helper import *
 import json
 import math
 import os
+import sys
 
-def create_parsed_book_informations_json():
+def create_parsed_book_informations_json(book_urls_file):
 
     # extract the contents of the given urls
-    filepath = "./books.txt"
+    filepath = book_urls_file
     file_book_urls = open(filepath, 'r')
     book_urls = []
     for line in file_book_urls:
@@ -20,7 +21,7 @@ def create_parsed_book_informations_json():
     docs = {"books": []}
     for book_url in book_urls:
         try:
-            title, author, description, urls_of_recommended_books, genres = helper.parse(book_url)
+            title, author, description, urls_of_recommended_books, genres = parse(book_url)
         except:
             docs['books'].append({'title': "", 'author': [], 'description': "", 'urls_of_recommended_books': [], 'genres': []})
         else:
@@ -88,14 +89,17 @@ def get_tf_idf_table(term_frequency_table, document_frequency_table):
 
 # MAIN
 if __name__ == "__main__":
+    # Read command line argument which is a path to a file containing book urls.
+    book_urls_file = sys.argv[1]
+
     # If "parsed_book_informations.json" is not in the current directory, it'll be created.
     # This will take about 1.5-2 hours.
     path = os.getcwd() + "/parsed_book_informations.json"
     if os.path.exists(path):
         print("Parsed Book Informations found in the current directory.")
     else:
-        print("Parsed book informations couldn't be found under the current directory. Creating this file will take about 1.5-2 hours.")
-        create_parsed_book_informations_json()
+        print("Parsed book informations couldn't be found under the current directory. Creating this file would take long.")
+        create_parsed_book_informations_json(book_urls_file)
 
     # read parsed book informations by JSON module
     parsed_book_informations = json_reader("parsed_book_informations.json")
