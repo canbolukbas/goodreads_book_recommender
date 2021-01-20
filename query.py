@@ -1,8 +1,9 @@
 import sys
 import os
+from single_url_recommendation import *
 
 def single_url_recommendation(path):
-    os.system("python single_url_recommendation.py {}".format(path))
+    main(path)
 
 def build_model(path):
     os.system("python build_model.py {}".format(path))

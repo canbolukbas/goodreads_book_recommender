@@ -8,15 +8,15 @@ import math
 import json
 import sys
 
-def get_top18books_urls():
+def get_top18books_urls(parsed_book_informations, top18books):
     top18books_urls = []
     for book_id in top18books:
         top18books_urls.append(parsed_book_informations['books'][book_id]['url'])
     return top18books_urls
 
-def evaluate():
+def evaluate(parsed_book_informations, top18books, urls_of_recommended_books):
     # To evaluate, I need their urls.
-    top18books_urls = get_top18books_urls()
+    top18books_urls = get_top18books_urls(parsed_book_informations, top18books)
 
     precision_acc = 0
     counter = 0
@@ -33,7 +33,7 @@ def evaluate():
 
     return average_precision, final_precision
 
-def get_recommendations():
+def get_recommendations(combined_scores):
     top18books = []
     temp = sorted(combined_scores, key= float, reverse= True)
     for i, item in enumerate(temp):
@@ -44,7 +44,7 @@ def get_recommendations():
     #print(top18books)
     return top18books
 
-def print_book_content():
+def print_book_content(title, authors, description, urls_of_recommended_books, genres):
 
     print("title:")
     print(title)
@@ -72,7 +72,7 @@ def get_book_similarity(scores_normalized, scores_normalized_genres):
         combined_scores.append(alpha*scores_normalized[i] + (1-alpha)*scores_normalized_genres[i])
     return combined_scores
 
-def calculate_query_term_weight(term, query, df):
+def calculate_query_term_weight(term, query, df, parsed_book_informations):
     counter = 0
     # Doing this for every term is very inefficient.
     for qt in query:
@@ -97,7 +97,7 @@ def get_term_index_from_df(term, df):
     terms = list(df.keys())
     return terms.index(term)
 
-def calculate_document_vectors(query, tfidf, df):
+def calculate_document_vectors(query, tfidf, df, parsed_book_informations):
     document_vectors = [[] for i in range(len(parsed_book_informations['books']))]
     for i, term in enumerate(query):
         # if term does not exist in the corpus, ignore. Move to another term.
@@ -118,11 +118,11 @@ def get_normalized_scores_new(scores, vector_lengths, query_length):
             normalized_scores.append(0)
     return normalized_scores
 
-def get_cosine_similarity_scores_new(tfidf, df, query):
+def get_cosine_similarity_scores_new(tfidf, df, query, parsed_book_informations):
     scores = [0 for i in range(len(parsed_book_informations['books']))]
     query_term_weight_list = []
     for term in query:
-        query_term_weight = calculate_query_term_weight(term, query, df)
+        query_term_weight = calculate_query_term_weight(term, query, df, parsed_book_informations)
         query_term_weight_list.append(query_term_weight)
         # This is due to usage of 2D array for tf-idf instead of a dict.
         # Check if the term exists in the Corpus, if doesn't exists continue
@@ -134,19 +134,19 @@ def get_cosine_similarity_scores_new(tfidf, df, query):
             scores[i]+=(weight * query_term_weight)
     
     query_length = calc_lengths([query_term_weight_list])[0]
-    document_vectors = calculate_document_vectors(query, tfidf, df)
+    document_vectors = calculate_document_vectors(query, tfidf, df, parsed_book_informations)
     document_vector_lengths = calc_lengths(document_vectors)
     return get_normalized_scores_new(scores, document_vector_lengths, query_length)
 
-def get_book_information(book_id):
+def get_book_information(book_id, parsed_book_informations):
     book_json = parsed_book_informations['books'][book_id]
     return book_json['title'], book_json['author']
 
-def print_books(book_id_arr):
+def print_books(book_id_arr, parsed_book_informations):
     # Construct the information list.
     book_informations = []
     for book_id in book_id_arr:
-        title, author = get_book_information(book_id)
+        title, author = get_book_information(book_id, parsed_book_informations)
         book_informations.append([title, author])
     
     # Print the list.
@@ -158,13 +158,12 @@ def print_books(book_id_arr):
     print()
 
 # MAIN
-if __name__ == "__main__":
+def main(book_url):
     # Extract the content of the book whose url is given
-    book_url = sys.argv[1]
     title, authors, description, urls_of_recommended_books, genres = parse(book_url)
 
     # Print the book content 
-    print_book_content()
+    print_book_content(title, authors, description, urls_of_recommended_books, genres)
 
     # Perform tokenization and normalization for description.
     terms = normalize(description)
@@ -177,24 +176,24 @@ if __name__ == "__main__":
     parsed_book_informations = json_reader("parsed_book_informations.json")
 
     # Get Cosine Similarity scores of books based on "Description"
-    scores_normalized_description_new = get_cosine_similarity_scores_new(tf_idf_table, df_description, terms)
+    scores_normalized_description_new = get_cosine_similarity_scores_new(tf_idf_table, df_description, terms, parsed_book_informations)
 
     # Get Cosine Similarity scores of books based on "Genres"
-    scores_normalized_genres_new = get_cosine_similarity_scores_new(tf_idf_table_genres, df_genres, genres)
+    scores_normalized_genres_new = get_cosine_similarity_scores_new(tf_idf_table_genres, df_genres, genres, parsed_book_informations)
 
     # combine genre based and description based similarities
     combined_scores = get_book_similarity(scores_normalized_description_new, scores_normalized_genres_new)
 
     # Recommend 18 books based on combined_scores.
-    top18books = get_recommendations()
+    top18books = get_recommendations(combined_scores)
 
     # Print informations of top 18 books.
-    print_books(top18books)
+    print_books(top18books, parsed_book_informations)
 
     # Evaluate the recommendations
     # Consider Goodreads recommendations as ground truth
     # top18books contains our system's recommendations
-    average_precision, final_precision = evaluate()
+    average_precision, final_precision = evaluate(parsed_book_informations, top18books, urls_of_recommended_books)
 
     # Output precision and average precision scores.
     print("final_precision: " + str(final_precision))
