@@ -1,7 +1,6 @@
 '''
 To-Do's:
 - \\xe2\\x80\\x99 problem is solved. But other may emerge.
-- Informer kitabından span 1 olduğu için patlıyor.
 '''
 
 import urllib.request
@@ -23,7 +22,6 @@ def json_saver(path: str, file: str):
 
 def authors_parser(myfile):
     try:
-        # AUTHOR = <a class="authorName" itemprop="url" href=.*><span itemprop="name">.*</span></a>
         authors = re.findall('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">.*?</span></a>', myfile)
         for i in range(len(authors)):
             author = authors[i]
@@ -48,8 +46,6 @@ def genre_parser(text):
         return result
 
 def title_parser(myfile):
-    # calculations on myfile
-    # TITLE = <h1 id="bookTitle" class="gr-h1 gr-h1--serif" itemprop="name">\n ....... \n</h1>
     try:
         title = re.search("<h1.*</h1>", myfile).group().split("\\n")[1].lstrip().rstrip()
     except:
@@ -61,7 +57,6 @@ def title_parser(myfile):
 
 def description_parser(myfile):
     try:
-        # DESCRIPTION = <div id="description" class="readable stacked" style="right:0"> </div> arasında. fakat ilk span değil, ikinci span. ikinci spande <div> ile </div> arasında. </p><p>'leri filan ignore et.
         description_readable_stacked = re.findall('<div id="description" class="readable stacked" style="right:0">.*?<a data-text-id=".*?" href="#" onclick', myfile)[0]
         #print(description_readable_stacked)
         #print()
@@ -125,7 +120,6 @@ def normalize(text):
     # white space removal
     tokens = text_with_no_punc.split()
 
-    # removing tokens with 0 length (idk how it's possible)
     temp = []
     for token in tokens:
         if len(token) == 0:

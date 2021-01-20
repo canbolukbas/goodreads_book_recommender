@@ -1,7 +1,3 @@
-'''
-To-Do's:
-- Currently, I'm just applying tf-idf. I didn't select informative words.
-'''
 from helper import *
 import json
 import math
@@ -30,7 +26,7 @@ def create_parsed_book_informations_json(book_urls_file):
     # Save the contents in JSON format.
     json_saver("parsed_book_informations.json", docs)
 
-def get_tf_df_tables(chosen_column_as_data):
+def get_tf_df_tables(chosen_column_as_data, parsed_book_informations):
     term_frequency_table = dict()
     document_frequency_table = dict()
     for book_id, book_info in enumerate(parsed_book_informations['books']):
@@ -73,7 +69,7 @@ def get_tf_df_tables(chosen_column_as_data):
     
     return term_frequency_table, document_frequency_table
 
-def get_tf_idf_table(term_frequency_table, document_frequency_table):
+def get_tf_idf_table(term_frequency_table, document_frequency_table, parsed_book_informations):
     # w(t, d) =(1+log10tf(t,d))×log10(N/df(t))
     # tf_idf table will be in size of len(total_tokens) x len(total_documents)
     tf_idf_table = [[0 for j in range(len(parsed_book_informations['books']))] for i in range(len(term_frequency_table))] 
@@ -85,13 +81,8 @@ def get_tf_idf_table(term_frequency_table, document_frequency_table):
             tf_idf_table[i][book_id] = (1 + math.log10(term_frequency_table[term][book_id])) * idf
     return tf_idf_table
 
-
-
 # MAIN
-if __name__ == "__main__":
-    # Read command line argument which is a path to a file containing book urls.
-    book_urls_file = sys.argv[1]
-
+def build_model_main(book_urls_file):
     # If "parsed_book_informations.json" is not in the current directory, it'll be created.
     # This will take about 1.5-2 hours.
     path = os.getcwd() + "/parsed_book_informations.json"
@@ -105,10 +96,10 @@ if __name__ == "__main__":
     parsed_book_informations = json_reader("parsed_book_informations.json")
 
     # Identify term and inverse document frequencies for book descriptions.
-    tf_description, df_description = get_tf_df_tables("description")
+    tf_description, df_description = get_tf_df_tables("description", parsed_book_informations)
 
     # Creating tf-idf table for book descriptions.
-    tf_idf_table_for_description = get_tf_idf_table(tf_description, df_description)
+    tf_idf_table_for_description = get_tf_idf_table(tf_description, df_description, parsed_book_informations)
         
     # Save tf_idf in JSON format.
     json_saver("tf_idf_description.json", tf_idf_table_for_description)
@@ -117,18 +108,13 @@ if __name__ == "__main__":
     json_saver("df_description.json", df_description)
 
     # Identify term and inverse document frequecies for book genres.
-    tf_genres, df_genres = get_tf_df_tables("genres")
+    tf_genres, df_genres = get_tf_df_tables("genres", parsed_book_informations)
 
     # Creating tf-idf table for book descriptions.
-    tf_idf_table_for_genres = get_tf_idf_table(tf_genres, df_genres)
+    tf_idf_table_for_genres = get_tf_idf_table(tf_genres, df_genres, parsed_book_informations)
         
     # Save tf_idf in JSON format.
     json_saver("tf_idf_genres.json", tf_idf_table_for_genres)
 
     # Save df in in JSON format
     json_saver("df_genres.json", df_genres)
-
-    # Select informative words by setting min/max thresholds on freq and number of terms(or sth else)
-    # Encode each book's description by using the occurences and scores of these informative words
-
-    # build and save the model with "selected" informative terms
