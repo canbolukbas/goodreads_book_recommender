@@ -165,44 +165,44 @@ def print_books(book_id_arr):
     print()
 
 # MAIN
+if __name__ == "__main__":
+    # Extract the content of the book whose url is given
+    book_url = "https://www.goodreads.com/book/show/31423133-make-your-bed"
+    title, authors, description, urls_of_recommended_books, genres = parse(book_url)
 
-# Extract the content of the book whose url is given
-book_url = "https://www.goodreads.com/book/show/31423133-make-your-bed"
-title, authors, description, urls_of_recommended_books, genres = parse(book_url)
+    # Print the book content 
+    print_book_content()
 
-# Print the book content 
-print_book_content()
+    # Perform tokenization and normalization for description.
+    terms = normalize(description)
 
-# Perform tokenization and normalization for description.
-terms = normalize(description)
+    # Read JSON files.
+    tf_idf_table = json_reader("tf_idf_description.json")
+    df_description = json_reader("df_description.json")
+    tf_idf_table_genres = json_reader("tf_idf_genres.json")
+    df_genres = json_reader("df_genres.json")
+    parsed_book_informations = json_reader("parsed_book_informations.json")
 
-# Read JSON files.
-tf_idf_table = json_reader("tf_idf_description.json")
-df_description = json_reader("df_description.json")
-tf_idf_table_genres = json_reader("tf_idf_genres.json")
-df_genres = json_reader("df_genres.json")
-parsed_book_informations = json_reader("parsed_book_informations.json")
+    # Get Cosine Similarity scores of books based on "Description"
+    scores_normalized_description_new = get_cosine_similarity_scores_new(tf_idf_table, df_description, terms)
 
-# Get Cosine Similarity scores of books based on "Description"
-scores_normalized_description_new = get_cosine_similarity_scores_new(tf_idf_table, df_description, terms)
+    # Get Cosine Similarity scores of books based on "Genres"
+    scores_normalized_genres_new = get_cosine_similarity_scores_new(tf_idf_table_genres, df_genres, genres)
 
-# Get Cosine Similarity scores of books based on "Genres"
-scores_normalized_genres_new = get_cosine_similarity_scores_new(tf_idf_table_genres, df_genres, genres)
+    # combine genre based and description based similarities
+    combined_scores = get_book_similarity(scores_normalized_description_new, scores_normalized_genres_new)
 
-# combine genre based and description based similarities
-combined_scores = get_book_similarity(scores_normalized_description_new, scores_normalized_genres_new)
+    # Recommend 18 books based on combined_scores.
+    top18books = get_recommendations()
 
-# Recommend 18 books based on combined_scores.
-top18books = get_recommendations()
+    # Print informations of top 18 books.
+    print_books(top18books)
 
-# Print informations of top 18 books.
-print_books(top18books)
+    # Evaluate the recommendations
+    # Consider Goodreads recommendations as ground truth
+    # top18books contains our system's recommendations
+    average_precision, final_precision = evaluate()
 
-# Evaluate the recommendations
-# Consider Goodreads recommendations as ground truth
-# top18books contains our system's recommendations
-average_precision, final_precision = evaluate()
-
-# Output precision and average precision scores.
-print("final_precision: " + str(final_precision))
-print("average_precision: " + str(average_precision))
+    # Output precision and average precision scores.
+    print("final_precision: " + str(final_precision))
+    print("average_precision: " + str(average_precision))
