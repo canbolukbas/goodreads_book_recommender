@@ -29,9 +29,6 @@ def evaluate():
             counter += 1
             precision_acc += (counter / (i+1))
 
-    print("Intersection: ")
-    print(set(top18books_urls).intersection(set(urls_of_recommended_books)))
-    print()
     final_precision = len(set(top18books_urls).intersection(set(urls_of_recommended_books))) / len(top18books_urls)
     if counter != 0:
         average_precision = precision_acc / len(set(top18books_urls).intersection(set(urls_of_recommended_books)))
@@ -53,7 +50,8 @@ def get_recommendations():
 
 def print_book_content():
 
-    print("title: " + title)
+    print("title:")
+    print(title)
     print()
     print("authors:")
     print(", ".join(authors))
@@ -147,6 +145,25 @@ def get_cosine_similarity_scores_new(tfidf, df, query):
     document_vector_lengths = calc_lengths(document_vectors)
     return get_normalized_scores_new(scores, document_vector_lengths, query_length)
 
+def get_book_information(book_id):
+    book_json = parsed_book_informations['books'][book_id]
+    return book_json['title'], book_json['author']
+
+def print_books(book_id_arr):
+    # Construct the information list.
+    book_informations = []
+    for book_id in book_id_arr:
+        title, author = get_book_information(book_id)
+        book_informations.append([title, author])
+    
+    # Print the list.
+    print("My 18 recommendations:")
+    for book_info in book_informations:
+        print("Title : {}".format(book_info[0]))
+        print("Author : {}".format(", ".join(book_info[1])))
+        print()
+    print()
+
 # MAIN
 
 # Extract the content of the book whose url is given
@@ -177,6 +194,9 @@ combined_scores = get_book_similarity(scores_normalized_description_new, scores_
 
 # Recommend 18 books based on combined_scores.
 top18books = get_recommendations()
+
+# Print informations of top 18 books.
+print_books(top18books)
 
 # Evaluate the recommendations
 # Consider Goodreads recommendations as ground truth
