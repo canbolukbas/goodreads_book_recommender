@@ -1,6 +1,6 @@
 '''
 To-Do's:
-- Evaluate() function contains filepath, but it shouldn't. This file can't have that information.
+- not sure about get_18books-urls
 '''
 
 from helper import *
@@ -8,20 +8,15 @@ import math
 import json
 import sys
 
-def evaluate():
-    # To evaluate, I need their urls.
-    filepath = "./books.txt"
-    file_book_urls = open(filepath, 'r')
-    book_urls = []
-    for line in file_book_urls:
-        book_urls.append(line.split('\n')[0])
-    file_book_urls.close()
-
-    assert len(book_urls) == len(parsed_book_informations['books'])
-
+def get_top18books_urls():
     top18books_urls = []
     for book_id in top18books:
-            top18books_urls.append(book_urls[book_id])
+        top18books_urls.append(parsed_book_informations['books'][book_id]['url'])
+    return top18books_urls
+
+def evaluate():
+    # To evaluate, I need their urls.
+    top18books_urls = get_top18books_urls()
 
     precision_acc = 0
     counter = 0
@@ -69,9 +64,6 @@ def print_book_content():
     print()
 
 def get_book_similarity(scores_normalized, scores_normalized_genres):
-    # jaqqard_coefficients_of_books
-    # scores_normalized
-
     alpha = 0.5
     
     combined_scores = []
