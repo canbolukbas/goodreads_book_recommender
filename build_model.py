@@ -83,14 +83,8 @@ def get_tf_idf_table(term_frequency_table, document_frequency_table, parsed_book
 
 # MAIN
 def build_model_main(book_urls_file):
-    # If "parsed_book_informations.json" is not in the current directory, it'll be created.
-    # This would take long.
-    path = os.getcwd() + "/parsed_book_informations.json"
-    if os.path.exists(path):
-        print("Parsed Book Informations found in the current directory.")
-    else:
-        print("Parsed book informations couldn't be found under the current directory. Creating this file would take long.")
-        create_parsed_book_informations_json(book_urls_file)
+    # Reads the file and creates a JSON file that contains book informations via parsing the HTML.
+    create_parsed_book_informations_json(book_urls_file)
 
     # read parsed book informations by JSON module
     parsed_book_informations = json_reader("parsed_book_informations.json")
