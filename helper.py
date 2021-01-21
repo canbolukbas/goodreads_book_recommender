@@ -20,6 +20,7 @@ def json_saver(path: str, file: str):
     json.dump(file, f, indent=2)
     f.close()
 
+# Parses the authors information
 def authors_parser(myfile):
     try:
         authors = re.findall('<a class="authorName" itemprop="url" href=.*?><span itemprop="name">.*?</span></a>', myfile)
@@ -33,6 +34,7 @@ def authors_parser(myfile):
     #print()
     return authors
 
+# Parses the genres information
 def genre_parser(text):
     try:
         lines = re.findall('<a class="actionLinkLite bookPageGenreLink" href=".*?">.*?</a>', text)
@@ -45,6 +47,7 @@ def genre_parser(text):
         # print(result)
         return result
 
+# Parses the title information
 def title_parser(myfile):
     try:
         title = re.search("<h1.*</h1>", myfile).group().split("\\n")[1].lstrip().rstrip()
@@ -55,6 +58,7 @@ def title_parser(myfile):
     #print()
     return title
 
+# Parses the description information
 def description_parser(myfile):
     try:
         description_readable_stacked = re.findall('<div id="description" class="readable stacked" style="right:0">.*?<a data-text-id=".*?" href="#" onclick', myfile)[0]
@@ -74,6 +78,7 @@ def description_parser(myfile):
     #print()
     return description
 
+# Parses the recommendations information
 def recommendations_parser(myfile):
     try:
         temp = re.findall('li class=.*?cover.*?id=.*?bookCover_.*?.*?>.*?n<a href=".*?"><img alt="', myfile)
@@ -85,6 +90,7 @@ def recommendations_parser(myfile):
     
     return urls_of_recommended_books
 
+# parser main function
 def parse(url: str):
 
     # Get url content and store it as a string.
@@ -101,6 +107,7 @@ def parse(url: str):
 
     return title, authors, description, urls_of_recommended_books, genres
 
+# transforms given string into list of normalized terms.
 def normalize(text):
 
     # case-folding

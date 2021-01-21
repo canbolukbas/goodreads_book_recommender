@@ -1,8 +1,3 @@
-'''
-To-Do's:
-- not sure about get_18books-urls
-'''
-
 from helper import *
 import math
 import json

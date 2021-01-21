@@ -84,7 +84,7 @@ def get_tf_idf_table(term_frequency_table, document_frequency_table, parsed_book
 # MAIN
 def build_model_main(book_urls_file):
     # If "parsed_book_informations.json" is not in the current directory, it'll be created.
-    # This will take about 1.5-2 hours.
+    # This would take long.
     path = os.getcwd() + "/parsed_book_informations.json"
     if os.path.exists(path):
         print("Parsed Book Informations found in the current directory.")
