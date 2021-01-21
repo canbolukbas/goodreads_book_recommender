@@ -6,4 +6,3 @@ To see recommmendations of a single book:
 
 Notes:
 - My python version is 3.9.0
-- If internet connection is lost during model building step, my script stucks. Please try again.
