@@ -1,3 +1,7 @@
+To-Do's:
+- change readme into .md file
+- develop a website for better user experience.
+
 To build model:
 > python query.py [PATH_OF_THE_FILE]
 e.g. python query.py books.txt
