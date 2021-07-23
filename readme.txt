@@ -1,6 +1,10 @@
 To-Do's:
 - change readme into .md file
-- develop a website for better user experience.
+- implement an endpoint which takes the url as a parameter and returns the list of recommendations.
+- deploy.
+- dockerize.
+- add CI & CD.
+- use external API's to get other website recommendations.
 
 To build model:
 > python query.py [PATH_OF_THE_FILE]
